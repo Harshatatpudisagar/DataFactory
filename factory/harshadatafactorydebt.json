@@ -1,0 +1,15 @@
+{
+	"name": "harshadatafactorydebt",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "1a104d4b-be51-4b44-b787-1e93c967d868",
+		"tenantId": "a1a798b5-33f2-4f63-be8d-3282775f46d6"
+	}
+}
