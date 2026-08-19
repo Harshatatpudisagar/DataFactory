@@ -1,6 +1,34 @@
 {
 	"name": "PL_Metadata_Driven_Load",
 	"properties": {
+		"activities": [
+			{
+				"name": "Lookup_ETL_Metadata",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzurePostgreSqlSource",
+						"query": "SELECT\n    source_schema,\n    source_table,\n    target_path,\n    load_type,\n    watermark_column,\n    is_active\nFROM public.etl_metadata\nWHERE is_active = TRUE;",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "DS_ETL_Metadata",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
 		"annotations": []
 	}
 }
