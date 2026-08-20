@@ -15,6 +15,10 @@
 		},
 		"annotations": [],
 		"type": "AzurePostgreSqlTable",
-		"schema": []
+		"schema": [],
+		"typeProperties": {
+			"schema": "",
+			"table": "@dataset().SourceSchema"
+		}
 	}
 }
