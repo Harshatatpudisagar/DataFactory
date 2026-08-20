@@ -64,14 +64,46 @@
 									"partitionOption": "None",
 									"queryTimeout": "02:00:00"
 								},
-								"enableStaging": false
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
 							},
 							"inputs": [
 								{
 									"referenceName": "DS_Dynamic_PostgreSQL_Source",
 									"type": "DatasetReference",
 									"parameters": {
-										"SourceSchema": "@item().source_schema"
+										"SourceSchema": "@item().source_schema",
+										"SourceTable": {
+											"value": "@item().source_table",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_Dynamic_Blob_Target",
+									"type": "DatasetReference",
+									"parameters": {
+										"TargetPath": "@item().target_path"
 									}
 								}
 							]
