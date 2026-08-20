@@ -103,7 +103,8 @@
 									"referenceName": "DS_Dynamic_Blob_Target",
 									"type": "DatasetReference",
 									"parameters": {
-										"TargetPath": "@item().target_path"
+										"TargetPath": "@item().target_path",
+										"FileName": "@concat(item().source_table, '.csv')"
 									}
 								}
 							]
