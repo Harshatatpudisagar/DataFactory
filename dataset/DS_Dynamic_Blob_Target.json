@@ -14,7 +14,9 @@
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobStorageLocation"
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "@dataset().TargetPath",
+				"container": "raw"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
