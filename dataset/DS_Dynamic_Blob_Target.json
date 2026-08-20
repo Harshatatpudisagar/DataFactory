@@ -1,0 +1,26 @@
+{
+	"name": "DS_Dynamic_Blob_Target",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_AzureBlob_Storage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TargetPath": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
