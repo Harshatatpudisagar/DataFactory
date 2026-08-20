@@ -17,8 +17,11 @@
 		"type": "AzurePostgreSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"schema": "",
-			"table": "@dataset().SourceSchema"
+			"schema": "@dataset().SourceSchema",
+			"table": {
+				"value": "@dataset().SourceTable",
+				"type": "Expression"
+			}
 		}
 	}
 }
