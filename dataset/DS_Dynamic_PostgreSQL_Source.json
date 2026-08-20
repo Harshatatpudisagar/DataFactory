@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"DS_Dynamic_PostgreSQL_Source": {
+			"SourceSchema": {
 				"type": "string"
 			},
 			"SourceTable": {
