@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "harshadatafactorydebt"
+		},
+		"GitHub1_credential": {
+			"value": ""
+		},
+		"LS_AzureBlob_Storage_connectionString": {
+			"value": ""
+		},
+		"LS_PostgreSQL_DE_password": {
+			"value": ""
+		},
+		"GitHub1_properties_typeProperties_username": {
+			"value": "Harshatatpudisagar"
+		},
+		"LS_PostgreSQL_DE_properties_typeProperties_server": {
+			"value": "harshapsotgresqldebt.postgres.database.azure.com"
+		},
+		"LS_PostgreSQL_DE_properties_typeProperties_database": {
+			"value": "de_learning"
+		},
+		"LS_PostgreSQL_DE_properties_typeProperties_username": {
+			"value": "pgadmin"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

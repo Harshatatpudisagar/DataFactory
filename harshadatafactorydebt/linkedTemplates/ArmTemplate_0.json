@@ -1,0 +1,910 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "harshadatafactorydebt"
+		},
+		"GitHub1_credential": {
+			"type": "secureString",
+			"metadata": "Secure string for 'credential' of 'GitHub1'"
+		},
+		"LS_AzureBlob_Storage_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_AzureBlob_Storage'"
+		},
+		"LS_PostgreSQL_DE_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_PostgreSQL_DE'"
+		},
+		"GitHub1_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "Harshatatpudisagar"
+		},
+		"LS_PostgreSQL_DE_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "harshapsotgresqldebt.postgres.database.azure.com"
+		},
+		"LS_PostgreSQL_DE_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "de_learning"
+		},
+		"LS_PostgreSQL_DE_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "pgadmin"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/GitHub1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "GitHub",
+				"typeProperties": {
+					"username": "[parameters('GitHub1_properties_typeProperties_username')]",
+					"credential": {
+						"type": "SecureString",
+						"value": "[parameters('GitHub1_credential')]"
+					},
+					"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDA0RkU3Q0ZBLUJCRDAtNDgwOS1CM0U4LTUxODFCRTZDQ0VENF82MTYwNzQ2Yi0wNjY4LTQwOTgtOGU1OS0yMTJjNWI5MWY3NWMiDQp9"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_AzureBlob_Storage')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_AzureBlob_Storage_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_PostgreSQL_DE')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzurePostgreSql",
+				"version": "2.0",
+				"typeProperties": {
+					"server": "[parameters('LS_PostgreSQL_DE_properties_typeProperties_server')]",
+					"port": "5432",
+					"database": "[parameters('LS_PostgreSQL_DE_properties_typeProperties_database')]",
+					"sslMode": 2,
+					"username": "[parameters('LS_PostgreSQL_DE_properties_typeProperties_username')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_PostgreSQL_DE_password')]"
+					},
+					"authenticationType": "Basic"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzurePostgreSqlTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_PostgreSQL_DE",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "public",
+					"table": "employees"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_PostgreSQL_DE')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Departments_PostgreSQL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_PostgreSQL_DE",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "department_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "department_name",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "location",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "departments"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_PostgreSQL_DE')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Dynamic_PostgreSQL_Source')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_PostgreSQL_DE",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"SourceSchema": {
+						"type": "string"
+					},
+					"SourceTable": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().SourceSchema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().SourceTable",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_PostgreSQL_DE')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ETL_Metadata')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_PostgreSQL_DE",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "source_schema",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "source_table",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "target_path",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "load_type",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "watermark_column",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "is_active",
+						"type": "boolean",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "etl_metadata"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_PostgreSQL_DE')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Employees_Target')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_AzureBlob_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "employees_copy.csv",
+						"container": "output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AzureBlob_Storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_AzureBlob_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "employee_test_sample.csv",
+						"container": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "employee_id",
+						"type": "String"
+					},
+					{
+						"name": "employee_code",
+						"type": "String"
+					},
+					{
+						"name": "employee_name",
+						"type": "String"
+					},
+					{
+						"name": "email",
+						"type": "String"
+					},
+					{
+						"name": "department",
+						"type": "String"
+					},
+					{
+						"name": "designation",
+						"type": "String"
+					},
+					{
+						"name": "joining_date",
+						"type": "String"
+					},
+					{
+						"name": "status",
+						"type": "String"
+					},
+					{
+						"name": "basic_salary",
+						"type": "String"
+					},
+					{
+						"name": "location",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AzureBlob_Storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Dynamic_Blob_Target')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_AzureBlob_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TargetPath": {
+						"type": "string"
+					},
+					"FileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "@concat(dataset().TargetPath, '.csv')",
+						"folderPath": "@dataset().TargetPath",
+						"container": "raw"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AzureBlob_Storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_Employees_To_PostgreSQL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzurePostgreSqlSink",
+								"writeBatchSize": 1000000,
+								"writeBatchTimeout": "00:30:00",
+								"writeMethod": "CopyCommand"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "employee_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "employee_id",
+											"type": "Int32",
+											"physicalType": "integer"
+										}
+									},
+									{
+										"source": {
+											"name": "employee_code",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "employee_code",
+											"type": "String",
+											"physicalType": "character varying"
+										}
+									},
+									{
+										"source": {
+											"name": "employee_name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "employee_name",
+											"type": "String",
+											"physicalType": "character varying"
+										}
+									},
+									{
+										"source": {
+											"name": "email",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "email",
+											"type": "String",
+											"physicalType": "character varying"
+										}
+									},
+									{
+										"source": {
+											"name": "department",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "department",
+											"type": "String",
+											"physicalType": "character varying"
+										}
+									},
+									{
+										"source": {
+											"name": "designation",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "designation",
+											"type": "String",
+											"physicalType": "character varying"
+										}
+									},
+									{
+										"source": {
+											"name": "joining_date",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "joining_date",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "status",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "status",
+											"type": "String",
+											"physicalType": "character varying"
+										}
+									},
+									{
+										"source": {
+											"name": "basic_salary",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "basic_salary",
+											"type": "Decimal",
+											"physicalType": "numeric"
+										}
+									},
+									{
+										"source": {
+											"name": "location",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "location",
+											"type": "String",
+											"physicalType": "character varying"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DelimitedText1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "AzurePostgreSqlTable1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2026-08-18T11:59:01Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DelimitedText1')]",
+				"[concat(variables('factoryId'), '/datasets/AzurePostgreSqlTable1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_Copy_Employees')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy_Employees",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "employee_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "employee_id",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "employee_code",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "employee_code",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "employee_name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "employee_name",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "email",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "email",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "department",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "department",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "designation",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "designation",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "joining_date",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "joining_date",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "status",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "status",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "basic_salary",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "basic_salary",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "location",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "location",
+											"type": "String",
+											"physicalType": "String"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DelimitedText1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_Employees_Target",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2026-08-18T11:59:01Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DelimitedText1')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Employees_Target')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_Metadata_Driven_Load')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup_ETL_Metadata",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzurePostgreSqlSource",
+								"query": "SELECT\n    source_schema,\n    source_table,\n    target_path,\n    load_type,\n    watermark_column,\n    is_active\nFROM public.etl_metadata\nWHERE is_active = TRUE;",
+								"partitionOption": "None",
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "DS_ETL_Metadata",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach_Tables",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup_ETL_Metadata",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup_ETL_Metadata').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy_Dynamic_Table",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzurePostgreSqlSource",
+											"partitionOption": "None",
+											"queryTimeout": "02:00:00"
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "DS_Dynamic_PostgreSQL_Source",
+											"type": "DatasetReference",
+											"parameters": {
+												"SourceSchema": "@item().source_schema",
+												"SourceTable": {
+													"value": "@item().source_table",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DS_Dynamic_Blob_Target",
+											"type": "DatasetReference",
+											"parameters": {
+												"TargetPath": "@item().target_path",
+												"FileName": "@concat(item().source_table, '.csv')"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_ETL_Metadata')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Dynamic_PostgreSQL_Source')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Dynamic_Blob_Target')]"
+			]
+		}
+	]
+}
