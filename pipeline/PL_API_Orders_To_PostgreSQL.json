@@ -86,7 +86,76 @@
 						"writeBatchTimeout": "00:30:00",
 						"writeMethod": "CopyCommand"
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['carts'][0]['id']"
+								},
+								"sink": {
+									"name": "cart_id",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"path": "$['carts'][0]['products'][0]['total']"
+								},
+								"sink": {
+									"name": "total",
+									"type": "Decimal"
+								}
+							},
+							{
+								"source": {
+									"path": "$['carts'][0]['products'][0]['discountedTotal']"
+								},
+								"sink": {
+									"name": "discounted_total",
+									"type": "Decimal"
+								}
+							},
+							{
+								"source": {
+									"path": "$['carts'][0]['total']"
+								},
+								"sink": {
+									"name": "total",
+									"type": "Decimal"
+								}
+							},
+							{
+								"source": {
+									"path": "$['carts'][0]['userId']"
+								},
+								"sink": {
+									"name": "user_id",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"path": "$['carts'][0]['totalProducts']"
+								},
+								"sink": {
+									"name": "total_products",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"path": "$['carts'][0]['totalQuantity']"
+								},
+								"sink": {
+									"name": "total_quantity",
+									"type": "Int32"
+								}
+							}
+						],
+						"collectionReference": "$['carts']"
+					}
 				},
 				"inputs": [
 					{
