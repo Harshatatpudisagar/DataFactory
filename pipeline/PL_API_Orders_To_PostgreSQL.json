@@ -45,7 +45,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "token",
-					"value": "@activity('GetToken').output.access_token"
+					"value": {
+						"value": "@activity('GetToken').output.access_token",
+						"type": "Expression"
+					}
 				}
 			},
 			{
@@ -74,7 +77,10 @@
 						"requestInterval": "00.00:00:00.010",
 						"requestMethod": "GET",
 						"additionalHeaders": {
-							"Authorization": "@concat('Bearer ', variables('token'))"
+							"Authorization": {
+								"value": "@concat('Bearer ', variables('token'))",
+								"type": "Expression"
+							}
 						},
 						"paginationRules": {
 							"supportRFC5988": "true"
@@ -187,7 +193,10 @@
 						"requestInterval": "00.00:00:00.010",
 						"requestMethod": "GET",
 						"additionalHeaders": {
-							"Authorization": "@concat('Bearer ', variables('token'))"
+							"Authorization": {
+								"value": "@concat('Bearer ', variables('token'))",
+								"type": "Expression"
+							}
 						},
 						"paginationRules": {
 							"supportRFC5988": "true"
@@ -316,7 +325,7 @@
 						"referenceName": "dataflow1",
 						"type": "DataFlowReference",
 						"parameters": {
-							"authorization": {
+							"token": {
 								"value": "'@{variables('token')}'",
 								"type": "Expression"
 							}
