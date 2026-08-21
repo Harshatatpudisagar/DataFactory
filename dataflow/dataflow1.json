@@ -22,7 +22,7 @@
 				"     validateSchema: false,",
 				"     httpMethod: 'GET',",
 				"     timeout: 30,",
-				"     requestInterval: 0,",
+				"     headers: ['Authorization' -> 'concat(\\'Bearer \\', $token)'],",
 				"     paginationRules: ['supportRFC5988' -> 'true'],",
 				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> OrdersAPI"
 			]
