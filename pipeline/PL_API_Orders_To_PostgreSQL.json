@@ -5,7 +5,14 @@
 			{
 				"name": "GetToken",
 				"type": "WebActivity",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "SetWatermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -204,11 +211,64 @@
 					},
 					"traceLevel": "Fine"
 				}
+			},
+			{
+				"name": "GetWatermark",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzurePostgreSqlSource",
+						"query": {
+							"value": "SELECT watermark_value\nFROM etl.watermark\nWHERE source_name = 'DummyJSON'\n  AND entity_name = 'Orders';",
+							"type": "Expression"
+						},
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "AzurePostgreSqlTable1",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "SetWatermark",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetWatermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "lastWatermark",
+					"value": "@string(activity('GetWatermark').output.firstRow.watermark_value)"
+				}
 			}
 		],
 		"variables": {
 			"token": {
 				"type": "String"
+			},
+			"lastWatermark": {
+				"type": "String",
+				"defaultValue": "0"
 			}
 		},
 		"annotations": []
