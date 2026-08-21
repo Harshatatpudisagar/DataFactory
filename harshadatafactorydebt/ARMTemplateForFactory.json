@@ -248,7 +248,14 @@
 					{
 						"name": "GetToken",
 						"type": "WebActivity",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "SetWatermark",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -440,6 +447,10 @@
 									"token": {
 										"value": "'@{variables('token')}'",
 										"type": "Expression"
+									},
+									"watermark": {
+										"value": "'@{variables('lastWatermark')}'",
+										"type": "Expression"
 									}
 								},
 								"datasetParameters": {
@@ -454,6 +465,59 @@
 							},
 							"traceLevel": "Fine"
 						}
+					},
+					{
+						"name": "GetWatermark",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzurePostgreSqlSource",
+								"query": {
+									"value": "SELECT watermark_value\nFROM etl.watermark\nWHERE source_name = 'DummyJSON'\n  AND entity_name = 'Orders';",
+									"type": "Expression"
+								},
+								"partitionOption": "None",
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "AzurePostgreSqlTable1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "SetWatermark",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetWatermark",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "lastWatermark",
+							"value": {
+								"value": "@string(activity('GetWatermark').output.firstRow.watermark_value)",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"policy": {
@@ -462,6 +526,10 @@
 				"variables": {
 					"token": {
 						"type": "String"
+					},
+					"lastWatermark": {
+						"type": "String",
+						"defaultValue": "0"
 					}
 				},
 				"annotations": []
@@ -469,7 +537,8 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_REST_Orders')]",
 				"[concat(variables('factoryId'), '/datasets/DS_Staging_Carts')]",
-				"[concat(variables('factoryId'), '/dataflows/dataflow1')]"
+				"[concat(variables('factoryId'), '/dataflows/dataflow1')]",
+				"[concat(variables('factoryId'), '/datasets/AzurePostgreSqlTable1')]"
 			]
 		},
 		{
@@ -1376,11 +1445,18 @@
 						},
 						{
 							"name": "SelectCartItems"
+						},
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "aggregate1"
 						}
 					],
 					"scriptLines": [
 						"parameters{",
-						"     token as string",
+						"     token as string,",
+						"     watermark as string",
 						"}",
 						"source(output(",
 						"          body as (carts as (discountedTotal as double, id as short, products as (discountPercentage as double, discountedTotal as double, id as short, price as double, quantity as short, thumbnail as string, title as string, total as double)[], total as double, totalProducts as short, totalQuantity as short, userId as short)[], limit as short, skip as boolean, total as short),",
@@ -1414,7 +1490,7 @@
 						"     ),",
 						"     skipDuplicateMapInputs: false,",
 						"     skipDuplicateMapOutputs: false) ~> FlattenProducts",
-						"FlattenProducts select(mapColumn(",
+						"filter1 select(mapColumn(",
 						"          discount_percentage,",
 						"          cart_id,",
 						"          product_id,",
@@ -1427,6 +1503,8 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> SelectCartItems",
+						"FlattenProducts filter(cart_id > toInteger($watermark)) ~> filter1",
+						"filter1 aggregate(new_watermark = max(cart_id)) ~> aggregate1",
 						"SelectCartItems sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
