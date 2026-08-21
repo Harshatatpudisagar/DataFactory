@@ -34,7 +34,8 @@
 			],
 			"scriptLines": [
 				"parameters{",
-				"     token as string",
+				"     token as string,",
+				"     watermark as string",
 				"}",
 				"source(output(",
 				"          body as (carts as (discountedTotal as double, id as short, products as (discountPercentage as double, discountedTotal as double, id as short, price as double, quantity as short, thumbnail as string, title as string, total as double)[], total as double, totalProducts as short, totalQuantity as short, userId as short)[], limit as short, skip as boolean, total as short),",
