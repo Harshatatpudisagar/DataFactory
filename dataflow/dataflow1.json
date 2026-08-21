@@ -12,7 +12,15 @@
 					"name": "OrdersAPI"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_Staging_Cart_Items",
+						"type": "DatasetReference"
+					},
+					"name": "OrdersAPIsink"
+				}
+			],
 			"transformations": [],
 			"scriptLines": [
 				"parameters{",
@@ -24,7 +32,29 @@
 				"     timeout: 30,",
 				"     headers: ['Authorization' -> 'concat(\\'Bearer \\', $token)'],",
 				"     paginationRules: ['supportRFC5988' -> 'true'],",
-				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> OrdersAPI"
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> OrdersAPI",
+				"OrdersAPI sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          cart_id as integer,",
+				"          product_id as integer,",
+				"          product_title as string,",
+				"          price as decimal(18,2),",
+				"          quantity as integer,",
+				"          total as decimal(18,2),",
+				"          discount_percentage as decimal(8,2),",
+				"          discounted_total as decimal(18,2),",
+				"          thumbnail as string,",
+				"          source_file as string,",
+				"          ingest_timestamp as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> OrdersAPIsink"
 			]
 		}
 	}
