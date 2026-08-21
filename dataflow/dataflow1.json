@@ -30,7 +30,6 @@
 				"     validateSchema: false,",
 				"     httpMethod: 'GET',",
 				"     timeout: 30,",
-				"     headers: ['token' -> '@concat(\\'Bearer \\', $token)'],",
 				"     paginationRules: ['supportRFC5988' -> 'false'],",
 				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> OrdersAPI",
 				"OrdersAPI sink(allowSchemaDrift: true,",
