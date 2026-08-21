@@ -26,6 +26,20 @@
 						"client_secret": "demo-secret"
 					}
 				}
+			},
+			{
+				"name": "SetToken",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "token",
+					"value": "@activity('GetToken').output.access_token"
+				}
 			}
 		],
 		"variables": {
