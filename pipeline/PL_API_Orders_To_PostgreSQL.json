@@ -193,14 +193,134 @@
 							"supportRFC5988": "true"
 						}
 					},
-					"enableStaging": false
+					"sink": {
+						"type": "AzurePostgreSqlSink",
+						"writeBatchSize": 1000000,
+						"writeBatchTimeout": "00:30:00",
+						"writeMethod": "CopyCommand"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['id']"
+								},
+								"sink": {
+									"name": "product_id",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"path": "['title']"
+								},
+								"sink": {
+									"name": "product_title",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['price']"
+								},
+								"sink": {
+									"name": "price",
+									"type": "Decimal"
+								}
+							},
+							{
+								"source": {
+									"path": "['quantity']"
+								},
+								"sink": {
+									"name": "quantity",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"path": "['total']"
+								},
+								"sink": {
+									"name": "total",
+									"type": "Decimal"
+								}
+							},
+							{
+								"source": {
+									"path": "['discountPercentage']"
+								},
+								"sink": {
+									"name": "discount_percentage",
+									"type": "Decimal"
+								}
+							},
+							{
+								"source": {
+									"path": "['discountedTotal']"
+								},
+								"sink": {
+									"name": "discounted_total",
+									"type": "Decimal"
+								}
+							},
+							{
+								"source": {
+									"path": "['thumbnail']"
+								},
+								"sink": {
+									"name": "thumbnail",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "$['carts'][products]"
+					}
 				},
 				"inputs": [
 					{
 						"referenceName": "DS_REST_Orders",
 						"type": "DatasetReference"
 					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_Staging_Cart_Items",
+						"type": "DatasetReference"
+					}
 				]
+			},
+			{
+				"name": "DF_CartItems",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "dataflow1",
+						"type": "DataFlowReference",
+						"parameters": {
+							"token": {
+								"value": "'@{variables('token')}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
 			}
 		],
 		"variables": {
