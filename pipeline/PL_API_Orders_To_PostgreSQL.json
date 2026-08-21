@@ -316,8 +316,8 @@
 						"referenceName": "dataflow1",
 						"type": "DataFlowReference",
 						"parameters": {
-							"token": {
-								"value": "'@{variables('token')}'",
+							"authorization": {
+								"value": "'@{concat('Bearer ', variables('token'))}'",
 								"type": "Expression"
 							}
 						}
