@@ -33,6 +33,9 @@
 				},
 				{
 					"name": "filter1"
+				},
+				{
+					"name": "aggregate1"
 				}
 			],
 			"scriptLines": [
@@ -86,6 +89,7 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> SelectCartItems",
 				"FlattenProducts filter(cart_id > toInteger($watermark)) ~> filter1",
+				"filter1 aggregate(new_watermark = max(cart_id)) ~> aggregate1",
 				"SelectCartItems sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
