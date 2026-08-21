@@ -21,19 +21,60 @@
 					"name": "OrdersAPIsink"
 				}
 			],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "FlattenCarts"
+				},
+				{
+					"name": "FlattenProducts"
+				},
+				{
+					"name": "SelectCartItems"
+				}
+			],
 			"scriptLines": [
 				"parameters{",
 				"     token as string",
 				"}",
-				"source(allowSchemaDrift: true,",
+				"source(output(",
+				"          body as (carts as (discountedTotal as double, id as short, products as (discountPercentage as double, discountedTotal as double, id as short, price as double, quantity as short, thumbnail as string, title as string, total as double)[], total as double, totalProducts as short, totalQuantity as short, userId as short)[], limit as short, skip as boolean, total as short),",
+				"          headers as [string,string]",
+				"     ),",
+				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     httpMethod: 'GET',",
 				"     timeout: 30,",
 				"     headers: ['Authorization' -> (concat('Bearer ', $token))],",
 				"     paginationRules: ['supportRFC5988' -> 'false'],",
 				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> OrdersAPI",
-				"OrdersAPI sink(allowSchemaDrift: true,",
+				"OrdersAPI foldDown(unroll(body.carts),",
+				"     mapColumn(",
+				"          cart_id = body.carts.id",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> FlattenCarts",
+				"FlattenCarts foldDown(unroll(body.carts.products),",
+				"     mapColumn(",
+				"          body = cart_id,",
+				"          headers",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> FlattenProducts",
+				"FlattenProducts select(mapColumn(",
+				"          cart_id = body.carts[1].id,",
+				"          product_id = body.carts[1].products[1].id,",
+				"          title = body.carts[1].products[1].title,",
+				"          discount_percentage = body.carts[1].products[1].discountPercentage,",
+				"          discounted_total = body.carts[1].products[1].discountedTotal,",
+				"          thumbnail = body.carts[1].products[1].thumbnail,",
+				"          price = body.carts[1].products[1].price,",
+				"          quantity = body.carts[1].products[1].quantity,",
+				"          thumbnail = body.carts[1].products[1].thumbnail,",
+				"          total = body.carts[1].products[1].total",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectCartItems",
+				"SelectCartItems sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          cart_id as integer,",
