@@ -26,6 +26,9 @@
 		"LS_PostgreSQL_DE_properties_typeProperties_username": {
 			"value": "pgadmin"
 		},
+		"LS_REST_OrdersAPI_properties_typeProperties_url": {
+			"value": "https://adf-oauth-api-orders-bhhhdsdjemc3c9c7.centralindia-01.azurewebsites.net"
+		},
 		"containerUri": {
 			"value": ""
 		},
