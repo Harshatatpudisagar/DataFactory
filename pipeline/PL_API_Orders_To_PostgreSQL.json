@@ -101,16 +101,7 @@
 							},
 							{
 								"source": {
-									"path": "$['carts'][0]['products'][0]['total']"
-								},
-								"sink": {
-									"name": "total",
-									"type": "Decimal"
-								}
-							},
-							{
-								"source": {
-									"path": "$['carts'][0]['products'][0]['discountedTotal']"
+									"path": "$['carts'][0]['discountedTotal']"
 								},
 								"sink": {
 									"name": "discounted_total",
