@@ -90,6 +90,7 @@
 						"type": "AzurePostgreSqlSink",
 						"writeBatchSize": 1000000,
 						"writeBatchTimeout": "00:30:00",
+						"preCopyScript": "TRUNCATE TABLE staging.stg_carts;",
 						"writeMethod": "CopyCommand"
 					},
 					"enableStaging": false,
